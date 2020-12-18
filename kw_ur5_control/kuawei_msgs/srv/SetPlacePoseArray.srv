@@ -1,0 +1,3 @@
+geometry_msgs/PoseArray EndEffector_poses
+---
+bool result

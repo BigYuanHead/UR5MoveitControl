@@ -1,0 +1,19 @@
+kuawei_param:
+  robot:
+    eye_on_hand: false
+
+    base_frame_id: 'base_link'
+    place_frame_id: 'placePoint_link'
+    tool_frame_id: 'tool0'
+    tcp_frame_id: 'GY85gripper_tcp_link' #GY85 use: 'GY85gripper_tcp_link'; vacuum gripper use:'gripper_tcp_link'
+                                     # tcp is Tool Center Point
+
+    tool_to_tcp_length: 0.16 # unit: meter
+    offset_rz: 0
+    max_v_factor: 1
+    max_acc_factor: 1
+    init_joint_states: [-0.785, -1.57, 1.57, -1.57, -1.57, 0.0]
+    target_joint_states: [-1, -1.57,-1.57, -1.57, 1.57, 1.57]
+    tool_model: "TwoFinger" # "Cylinder", "Box" or "TwoFinger"
+
+    move_group_name: "ur5_arm"

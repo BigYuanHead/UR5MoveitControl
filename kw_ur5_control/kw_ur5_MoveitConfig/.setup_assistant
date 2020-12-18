@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: kw_ur5_description
+    relative_path: urdf/kw_UR5_macro.xacro
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/kw_ur5_robot.srdf
+  CONFIG:
+    author_name: Jeff
+    author_email: 157685384@qq.com
+    generated_timestamp: 1597399310

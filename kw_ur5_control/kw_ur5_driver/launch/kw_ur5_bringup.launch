@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="robot_ip" default="192.168.31.89"/>
+  <arg name="limited" default="true"/>
+  <arg name="robot_description_file" default="$(find kw_ur5_description)/launch/kw_ur5_upload.launch"/>
+  <arg name="kinematics_config" default="$(find ur_description)/config/ur5_default.yaml"/>
+  <arg name="debug" value="False"/>
+
+  <!--include from UR_ROS_Driver-->
+  <include file="$(find ur_robot_driver)/launch/ur5_bringup.launch">
+    <arg name="robot_ip" value="$(arg robot_ip)"/>
+    <arg name="limited" value="$(arg limited)"/>
+    <arg name="robot_description_file" value="$(arg robot_description_file)"/>
+    <arg name="kinematics_config" value="$(arg kinematics_config)"/>
+  </include>
+
+</launch>

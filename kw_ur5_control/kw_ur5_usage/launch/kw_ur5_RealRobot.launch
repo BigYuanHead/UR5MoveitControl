@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!-- note: controllers.yaml in moveit_config has to be setup for specific controller -->
+<!--runs the real robot setup on the local machine-->
+<launch>
+  <arg name="robot_ip" default="192.168.31.89"/>
+  <arg name="limited" default="true"/>
+  <arg name="robot_description_file" default="$(find kw_ur5_description)/launch/kw_ur5_upload.launch" />
+  <arg name="kinematics_config" default="$(find kw_ur5_description)/kinematics_config/robot_calibration.yaml"/>
+
+  <include file="$(find kw_ur5_driver)/launch/kw_ur5_bringup.launch">
+    <arg name="robot_ip" default="$(arg robot_ip)"/>
+    <arg name="limited" default="$(arg limited)"/>
+    <arg name="robot_description_file" default="$(arg robot_description_file)" />
+    <arg name="kinematics_config" default="$(arg kinematics_config)"/>
+  </include>
+
+<!-- start moveit & rviz -->
+  <include file="$(find kw_ur5_MoveitConfig)/launch/move_group.launch">
+    <arg name="debug" default="false" />
+  </include>
+
+  <!--<include file="$(find kw_ur3_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="config" value="true"/>
+  </include>-->
+
+  <param name="move_group/trajectory_execution/allowed_start_tolerance" value="0.5" />
+
+<!--  -->
+  <rosparam command="load"  file="$(find kw_ur5_usage)/config/config_robot.yaml" />
+
+  <node name="kw_ur5_node" pkg="kw_ur5_usage" type="KwRobot.py" output="screen"/>
+  <!--<node name="kw_ur3_node" pkg="kw_ur3_moveit_usage" type="kw_ur3_moveit_usage_node" output="screen"/>-->
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="rename_base_link"
+      args="0.0 0 0 0 0 0 base_link robot_base_link" />  
+  <node pkg="tf2_ros" type="static_transform_publisher" name="rename_tool_link"
+      args="0.0 0 0 0 0 0 tool0 robot_tool_link" />
+
+</launch>

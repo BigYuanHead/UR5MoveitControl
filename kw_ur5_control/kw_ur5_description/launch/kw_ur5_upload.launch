@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="limited" default="true" doc="If true, limits joint range [-PI, PI] on all joints." />
+  <arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface" />
+  <arg name="kinematics_config" default="$(find ur_description)/config/ur5_default.yaml"/>
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find kw_ur5_description)/urdf/kw_UR5_macro.xacro'
+    limited:=$(arg limited)
+    transmission_hw_interface:=$(arg transmission_hw_interface)
+    kinematics_config:=$(arg kinematics_config)" />
+
+</launch>

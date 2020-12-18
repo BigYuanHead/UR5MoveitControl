@@ -1,0 +1,6 @@
+<launch>
+
+	<node name="SModelTcpNode" pkg="robotiq_s_model_control" type="SModelTcpNode.py" args="160.69.69.7" />
+	<node name="SModelControlService" pkg="robotiq_s_model_control" type="SModelControlService.py"/>
+
+</launch>

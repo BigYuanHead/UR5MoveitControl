@@ -1,0 +1,3 @@
+float64[16] pose_on_camera_frame
+---
+bool result 

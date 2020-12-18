@@ -1,0 +1,245 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="kw_ur5_robot" >
+
+	<xacro:arg name="limited" default="true"/>
+
+	<xacro:property name="using_GY85Gripper" value="true" />
+	<xacro:property name="using_vacuumGripper" value="false" />
+	<xacro:property name="using_quickInstaller" value="false" />
+
+	<!-- ==================== world frame ====================================== -->
+	<link name="world" />
+
+	<!-- ================================ add a table =========================== -->
+	<!--<xacro:include filename="$(find kw_ur5_description)/urdf/objects/table.xacro" />-->
+
+	<!-- <xacro:property name="table_length" value="1.80" />
+	<xacro:property name="table_wide" value="1.420" />
+	<xacro:property name="table_height" value="0.04" />
+
+	<link name="table_link">
+		<visual>
+			<origin xyz="0.0 0.0 0.0" rpy="0 0 0.0" />
+			<geometry>
+				<box size="${table_length} ${table_wide} ${table_height}"/>
+			</geometry>
+			<material name="black">
+				<color rgba="0.5 0.0 0.5 1.0"/>
+				<texture filename=""/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0.0 0.0 0.0" rpy="0 0 0.0" />
+			<geometry>
+				<box size="${table_length} ${table_wide} ${table_height}"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<link name="table_base_link">
+		<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+	</link>
+
+	<joint name="world_to_table_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0.0" />
+        <parent link="world" />
+		<child link="table_link" />
+	</joint>
+
+	<joint name="table_to_tableBase_joint" type="fixed">
+        <origin xyz="${-table_length/2+0.23} ${-table_wide/2+0.31} ${table_height/2+0.04}" rpy="0.0 0.0 0.0"/>
+        <parent link="table_link" />
+		<child link="table_base_link" />
+	</joint> -->
+
+	<!-- =========================  THE ROBOT =================================== -->
+
+  	<xacro:arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface"/>
+	<!-- arm kinematics_config -->
+	<xacro:arg name="kinematics_config" default="$(find ur_description)/config/ur5_default.yaml"/>
+
+	<!-- UR from ROS-i repos -->
+	<xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
+	<xacro:ur5_robot prefix="" joint_limited="true"
+		transmission_hw_interface="$(arg transmission_hw_interface)"
+		kinematics_file="${load_yaml('$(arg kinematics_config)')}"
+	/>
+	
+	<!-- <joint name="world_to_arm_base_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0.0" />
+        <parent link="table_base_link" />
+		<child link="base_link" />
+	</joint>  -->
+
+	<joint name="world_to_arm_base_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0.0" />
+        <parent link="world" />
+		<child link="base_link" />
+	</joint> 
+
+	<!-- ============= using by quickInstaller ========================= -->
+	<xacro:if value="${using_quickInstaller}">
+		<xacro:property name="quickInstaller_BaseDiameter" value="0.075" />
+		<xacro:property name="quickInstaller_BaseLength" value="0.054" />
+
+		<xacro:property name="quickInstaller_mountDiameter" value="0.075" />
+		<xacro:property name="quickInstaller_mountLength" value="0.009" />
+
+		<link name="quickInstaller_base_link">
+			<visual>
+				<origin xyz="0 0 ${quickInstaller_BaseLength/2}" rpy="0 0 0"/>
+				<geometry>
+					<cylinder length="${quickInstaller_BaseLength}" radius="${quickInstaller_BaseDiameter/2}"/>
+				</geometry>
+				<material name="Green">
+					<color rgba="0.0 1.0 0.0 1.0"/>
+				</material>
+			</visual>
+			<collision>
+				<origin xyz="0 0 ${quickInstaller_BaseLength/2}" rpy="0 0 0"/>
+				<geometry>
+					<cylinder length="${quickInstaller_BaseLength}" radius="${quickInstaller_BaseDiameter/2}"/>
+				</geometry>
+			</collision>
+		</link>
+		
+		<link name="quickInstaller_baseEE_link"/>
+
+		<link name="quickInstaller_mount_link">
+			<visual>
+				<origin xyz="0 0 ${quickInstaller_mountLength/2}" rpy="0 0 0"/>
+				<geometry>
+					<cylinder length="${quickInstaller_mountLength}" radius="${quickInstaller_mountDiameter/2}"/>
+				</geometry>
+				<material name="Green2">
+					<color rgba="0.0 0.4 0.5 1.0"/>
+				</material>
+			</visual>
+			<collision>
+				<origin xyz="0 0 ${quickInstaller_mountLength/2}" rpy="0 0 0"/>
+				<geometry>
+					<cylinder length="${quickInstaller_mountLength}" radius="${quickInstaller_mountDiameter/2}"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<link name="quickInstaller_mountEE_link"/>
+
+		<joint name="tool0_to_quickInstaller_base_joint" type="fixed">
+			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+			<parent link="tool0"/>
+			<child link="quickInstaller_base_link"/>
+		</joint>
+
+		<joint name="quickInstaller_base_to_quickInstaller_baseEE_joint" type="fixed">
+			<origin xyz="0.0 0.0 ${quickInstaller_BaseLength}" rpy="0.0 0.0 0.0"/>
+			<parent link="quickInstaller_base_link"/>
+			<child link="quickInstaller_baseEE_link"/>
+		</joint>
+
+		<joint name="quickInstaller_baseEE_to_quickInstaller_mount_joint" type="fixed">
+			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+			<parent link="quickInstaller_baseEE_link"/>
+			<child link="quickInstaller_mount_link"/>
+		</joint>
+
+		<joint name="quickInstaller_mount_to_quickInstaller_mountEE_joint" type="fixed">
+			<origin xyz="0.0 0.0 ${quickInstaller_mountLength}" rpy="0.0 0.0 0.0"/>
+			<parent link="quickInstaller_mount_link"/>
+			<child link="quickInstaller_mountEE_link"/>
+		</joint>
+
+	</xacro:if>
+
+	<!-- ==================== using GY85 Gripper ============================ -->
+	<xacro:if value="${using_GY85Gripper}">
+
+		<xacro:property name="GY85TCP_length" value="0.165" />
+
+		<xacro:if value="${using_quickInstaller}">
+			<!--end effector: UR_tool0->ee -->
+			<joint name="quickInstaller_mountEE_to_GY85EE_joint" type="fixed">
+				<parent link="quickInstaller_mountEE_link" />
+				<child link="GY85gripper_ee_link" />
+				<origin xyz="0 0 0" rpy="0 0 0" />
+			</joint>
+		</xacro:if>
+		<xacro:unless value="${using_quickInstaller}">
+			<joint name="gripper_ee_to_tool0_joint" type="fixed">
+				<parent link="tool0" />
+				<child link="GY85gripper_ee_link" />
+				<origin xyz="0 0 0" rpy="0 0 0" />
+			</joint>
+		</xacro:unless>
+
+		<link name="GY85gripper_ee_link" />
+		<link name="GY85gripper_tcp_link" />
+
+		<xacro:include filename="$(find robotiq_85_description)/urdf/robotiq_85_gripper.urdf.xacro" />
+		<xacro:robotiq_85_gripper prefix="" parent="tool0">
+			<origin xyz="0 0 0" rpy="${pi/2} -${pi/2} 0" />
+		</xacro:robotiq_85_gripper>
+		
+		<!-- gripper_tcp_link -> gripper_ee_link-->
+		<joint name="gripper_tcp_to_gripper_ee_joint" type="fixed">
+			<parent link="GY85gripper_ee_link" />
+			<child link="GY85gripper_tcp_link" />
+			<!-- <origin xyz="0 0 0.165" rpy="0 0 ${pi/2}" /> -->
+			<origin xyz="0.0 0 ${GY85TCP_length}" rpy="0 0 0" />
+		</joint>
+
+	 </xacro:if>
+
+	<!-- ========================= using Vacuum Gripper ========================= -->
+	<xacro:if value="${using_vacuumGripper}">
+
+		<xacro:property name="vacuumTCP_length" value="0.17" />
+
+		<xacro:if value="${using_quickInstaller}">
+			<!-- quickInstallerMountEE -> vacuumGripperEE -->
+			<joint name="quickInstaller_mountEE_to_vacuumEE_joint" type="fixed">
+				<parent link="quickInstaller_mountEE_link" />
+				<child link="gripper_ee_link" />
+				<origin xyz="0 0 0" rpy="0 0 0" />
+			</joint>
+		</xacro:if>
+		<xacro:unless value="${using_quickInstaller}">
+			<!--end effector: UR_tool0->ee -->
+			<joint name="gripper_ee_to_tool0_joint" type="fixed">
+				<parent link="tool0" />
+				<child link="gripper_ee_link" />
+				<origin xyz="0 0 0" rpy="0 0 0" />
+			</joint>
+		</xacro:unless>
+
+		<link name="gripper_ee_link">
+			<visual>
+				<origin xyz="0 0 ${vacuumTCP_length/2}" rpy="0 0 0"/>
+				<geometry>
+					<cylinder length="${vacuumTCP_length}" radius="0.0125" />
+				</geometry>
+				<material name="LightGrey">
+					<color rgba="0.7 0.7 0.7 1.0"/>
+				</material>
+			</visual>
+			<collision>
+				<origin xyz="0 0 ${vacuumTCP_length/2}" rpy="0 0 0"/>
+				<geometry>
+					<cylinder length="${vacuumTCP_length}" radius="0.0125" />
+				</geometry>
+			</collision>
+		</link>
+
+		<link name="gripper_tcp_link">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+		</link>
+		
+		<!-- gripper_tcp_link -> gripper_ee_link-->
+		<joint name="gripper_tcp_to_gripper_ee_joint" type="fixed">
+			<parent link="gripper_ee_link" />
+			<child link="gripper_tcp_link" />
+			<origin xyz="0.0 0.0 ${vacuumTCP_length}" rpy="0 0 0" />
+		</joint>	
+	 </xacro:if>
+
+</robot>
